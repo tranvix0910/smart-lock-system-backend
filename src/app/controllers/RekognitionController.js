@@ -147,7 +147,6 @@ export const uploadImageToS3AndIndexFace = async (req, res) => {
 
         console.log('Image data:', imageData);
 
-        // Lưu thông tin vào database
         await FaceID.create(imageData);
 
         return res.status(200).json({
