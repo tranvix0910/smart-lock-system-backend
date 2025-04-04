@@ -1,0 +1,34 @@
+{
+    "devices": [
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "LOCK-001",
+            "name": "Main Door Lock",
+            "location": "Main Entrance",
+            "status": "ONLINE",
+            "lockState": "LOCK",
+            "lastMaintenance": "2024-02-20",
+            "batteryLevel": 85
+        },
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "LOCK-002",
+            "name": "Office Lock",
+            "location": "Office Area",
+            "status": "ONLINE",
+            "lockState": "UNLOCK",
+            "lastMaintenance": "2024-02-15",
+            "batteryLevel": 92
+        },
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "LOCK-003",
+            "name": "Storage Lock",
+            "location": "Storage Room",
+            "status": "OFFLINE",
+            "lockState": "LOCK",
+            "lastMaintenance": "2024-02-10",
+            "batteryLevel": 45
+        }
+    ]
+} 
