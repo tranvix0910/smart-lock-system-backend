@@ -17,7 +17,7 @@ const faceIDSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    s3Url: {
+    imageName: {
         type: String,
         required: true
     },

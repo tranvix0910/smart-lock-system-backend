@@ -5,35 +5,36 @@ export const getFaceIdByUserId = async (req, res) => {
     try {
         const { userId } = req.params;
         
-        const faceId = await FaceID.findOne(
+        const faceIds = await FaceID.find(
             { userId },
             {
                 userName: 1,
                 userId: 1,
                 deviceId: 1,
-                s3Url: 1,
+                imageName: 1,
                 faceId: 1,
                 createdAt: 1,
                 _id: 0
             }
-        );
+        ).sort({ createdAt: -1 });
 
-        if (!faceId) {
+        if (!faceIds || faceIds.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: 'Face ID not found for this user'
+                message: 'No Face IDs found for this user'
             });
         }
 
         return res.status(200).json({
             success: true,
-            data: faceId
+            count: faceIds.length,
+            data: faceIds
         });
     } catch (error) {
         console.error('Error in getFaceIdByUserId:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error retrieving Face ID',
+            message: 'Error retrieving Face IDs',
             error: error.message
         });
     }

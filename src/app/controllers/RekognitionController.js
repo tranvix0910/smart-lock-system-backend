@@ -1,15 +1,9 @@
-import { RekognitionClient, CreateCollectionCommand, IndexFacesCommand, SearchFacesByImageCommand } from '@aws-sdk/client-rekognition';
-import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { RekognitionClient, CreateCollectionCommand, IndexFacesCommand, DeleteFacesCommand } from '@aws-sdk/client-rekognition';
 import FaceID from '../models/FaceID.js';
+import { uploadImageToS3 } from './S3Controller.js';
+
 const REGION = 'ap-southeast-1';
-
 const SOURCE_BUCKET = 'smart-door-system';
-
-
-const getS3Url = (bucket, region, key) => {
-    return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
-};
 
 const formatExternalImageId = (userName) => {
     return userName
@@ -20,19 +14,15 @@ const formatExternalImageId = (userName) => {
         .replace(/^-+|-+$/g, ''); // Xóa dấu gạch ngang ở đầu và cuối
 };
 
-const s3Client = new S3Client({
-    region: REGION
-});
-
 const rekogClient = new RekognitionClient({
     region: REGION,
 });
 
 // [POST] /api/rekognition/index-face/:userId/:deviceId
-export const uploadImageToS3AndIndexFace = async (req, res) => {
+export const IndexFace = async (req, res) => {
     try {
         const { userId, deviceId } = req.params;
-        const { userName } = req.body;
+        const { userName, imageName } = req.body;
         
         console.log('Request Files:', req.files);
         console.log('Request Body:', req.body);
@@ -48,134 +38,120 @@ export const uploadImageToS3AndIndexFace = async (req, res) => {
             });
         }
 
-        if (!userId || !deviceId) {
-            return res.status(400).json({
-                success: false,
-                message: 'userId and deviceId are required'
-            });
-        }
-
-        if (!userName) {
-            return res.status(400).json({
-                success: false,
-                message: 'userName is required'
-            });
-        }
-
-        console.log('Received image:', {
-            name: image.name,
-            size: image.size,
-            mimetype: image.mimetype
-        });
-
-        // Kiểm tra định dạng file
-        if (!image.mimetype.startsWith('image/')) {
-            return res.status(400).json({
-                success: false,
-                message: 'File must be an image'
-            });
-        }
-
+        // Tạo key cho ảnh
         const timestamp = Date.now();
-        const imageKey = `faces/${userId}/${deviceId}/${timestamp}_${image.name}`;
+        // Sử dụng tên file gốc hoặc định dạng mới
+        const imageKey = `users/${userId}/faces/${deviceId}/${image.name}`;
         
-        // Tạo S3 URL cho ảnh
-        const s3Url = getS3Url(SOURCE_BUCKET, REGION, imageKey);
-        console.log('Generated S3 URL:', s3Url);
+        try {
+            // Upload ảnh lên S3
+            const uploadResult = await uploadImageToS3({ 
+                bucket: SOURCE_BUCKET, 
+                userName, 
+                type: 'registered-face', 
+                userId, 
+                deviceId, 
+                imageKey, 
+                image,
+                timestamp: String(timestamp)
+            });
+            
+            console.log('Upload result:', uploadResult);
 
-        const uploadCommand = new PutObjectCommand({
-            Bucket: SOURCE_BUCKET,
-            Key: imageKey,
-            Body: image.data,
-            ContentType: image.mimetype,
-            Metadata: {
-                "user-name": userName,
-                "type": "registered-face",
+            const collectionId = `smartlock-${userId}-${deviceId}`;
+            const formattedUserName = formatExternalImageId(userName);
+            console.log('Formatted userName:', formattedUserName);
+
+            // Wait for 500ms to ensure the image is processed on S3
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const indexParams = {
+                CollectionId: collectionId,
+                Image: {
+                    S3Object: {
+                        Bucket: SOURCE_BUCKET,
+                        Name: imageKey,
+                    },
+                },
+                ExternalImageId: formattedUserName,
+                DetectionAttributes: ['ALL'],
+            };
+
+            console.log('Index params:', indexParams);
+            const indexCommand = new IndexFacesCommand(indexParams);
+            const indexResponse = await rekogClient.send(indexCommand);
+            console.log('Index response:', indexResponse);
+
+            const faceRecord = indexResponse.FaceRecords?.[0];
+            if (!faceRecord) {
+                throw new Error('No face detected in the image');
             }
-        });
 
-        await s3Client.send(uploadCommand);
-
-        const collectionId = `smartlock-${userId}-${deviceId}`;
-        const formattedUserName = formatExternalImageId(userName);
-        console.log('Formatted userName:', formattedUserName);
-
-        const indexParams = {
-            CollectionId: collectionId,
-            Image: {
-                S3Object: {
-                    Bucket: SOURCE_BUCKET,
-                    Name: imageKey,
+            const { 
+                Face: { 
+                    FaceId, 
+                    BoundingBox, 
+                    ImageId, 
+                    Confidence 
                 },
-            },
-            ExternalImageId: formattedUserName,
-            DetectionAttributes: ['ALL'],
-        };
+                FaceDetail 
+            } = faceRecord;
 
-        const indexCommand = new IndexFacesCommand(indexParams);
-        const indexResponse = await rekogClient.send(indexCommand);
-        console.log('Index response:', indexResponse);
+            const s3Url = uploadResult.s3Url;
 
-        // Xử lý response để lấy faceId và thông tin khác
-        const faceRecord = indexResponse.FaceRecords[0];
-        if (!faceRecord) {
-            throw new Error('No face detected in the image');
-        }
+            const imageData = {
+                imageKey,
+                userName,
+                userId,
+                deviceId,
+                imageName: imageName || image.name,
+                s3Url,
+                faceId: FaceId,
+                boundingBox: BoundingBox,
+                imageId: ImageId,
+                confidence: Confidence,
+                faceDetail: FaceDetail
+            };
 
-        const { 
-            Face: { 
-                FaceId, 
-                BoundingBox, 
-                ImageId, 
-                Confidence 
-            },
-            FaceDetail 
-        } = faceRecord;
+            console.log('Image data:', imageData);
 
-        const imageData = {
-            imageKey,
-            userName,
-            userId,
-            deviceId,
-            s3Url,
-            faceId: FaceId,
-            boundingBox: BoundingBox,
-            imageId: ImageId,
-            confidence: Confidence,
-            faceDetail: FaceDetail
-        };
+            await FaceID.create(imageData);
 
-        console.log('Image data:', imageData);
-
-        await FaceID.create(imageData);
-
-        return res.status(200).json({
-            success: true,
-            message: 'Image uploaded and face indexed successfully',
-            data: {
-                upload: {
-                    imageKey,
-                    userName,
-                    userId,
-                    deviceId,
-                    s3Url,     // Thêm s3Url vào response
-                    timestamp
-                },
-                index: {
-                    faceId: FaceId,
-                    boundingBox: BoundingBox,
-                    imageId: ImageId,
-                    confidence: Confidence,
-                    collectionId,
-                    formattedUserName
+            return res.status(200).json({
+                success: true,
+                message: 'Image uploaded and face indexed successfully',
+                data: {
+                    upload: {
+                        imageKey,
+                        userName,
+                        userId,
+                        deviceId,
+                        s3Url,
+                        timestamp
+                    },
+                    index: {
+                        faceId: FaceId,
+                        boundingBox: BoundingBox,
+                        imageId: ImageId,
+                        confidence: Confidence,
+                        collectionId,
+                        formattedUserName
+                    }
                 }
-            }
-        });
+            });
+        } catch (uploadError) {
+            console.error('Error during upload or indexing:', uploadError);
+            return res.status(500).json({
+                success: false,
+                message: 'Error during upload or indexing process',
+                error: uploadError.message
+            });
+        }
     } catch (error) {
-        console.error('Error in upload and index process:', error);
+        console.error('Error in face registration process:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error in upload and index process',
+            message: 'Error in face registration process',
             error: error.message
         });
     }
@@ -221,3 +197,38 @@ export const createCollection = async (req, res) => {
         });
     }
 };
+
+// [DELETE] /api/rekognition/delete-face/:userId/:deviceId
+export const deleteFace = async (req, res) => {
+    try {
+        const { userId, deviceId } = req.params;
+        const { faceId } = req.body;
+
+        if (!userId || !deviceId || !faceId) {
+            return res.status(400).json({
+                success: false,
+                message: 'userId, deviceId and faceId are required'
+            });
+        }
+
+        const collectionId = `smartlock-${userId}-${deviceId}`;
+        const command = new DeleteFacesCommand({
+            CollectionId: collectionId,
+            FaceIds: [faceId]
+        }); 
+        const response = await rekogClient.send(command);
+        await FaceID.deleteOne({ faceId });
+        return res.status(200).json({
+            success: true,
+            message: 'Face deleted successfully',
+            data: response
+        });
+    } catch (error) {
+        console.error('Error deleting face:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error deleting face',
+            error: error.message
+        });
+    }
+}
