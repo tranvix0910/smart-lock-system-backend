@@ -1,18 +1,37 @@
 import device from '../config/awsIoT/index.js';
 import { notifyAll } from '../config/websocket/index.js';
-import { updateDeviceState } from '../app/services/deviceStateService.js';
+import { updateDeviceState } from '../app/services/aws/IoTCore/deviceStateService.js';
 import Fingerprint from '../app/models/Fingerprint.js';
 import FaceID from '../app/models/FaceID.js';
 import RFIDCard from '../app/models/RFID.js';
+import Device from '../app/models/Device.js';
+import RecentAccessLog from '../app/models/RecentAccessLogs.js';
 
 let isMessageHandlerRegistered = false;
 const subscribedTopics = new Set();
 const fingerprintRequests = new Map();
 const rfidRequests = new Map();
 
+const subscribeDefaultTopics = async () => {
+    try {
+        const devices = await Device.find({});
+        
+        for (const device of devices) {
+            const recentAccessTopic = `recentAccess-smartlock/${device.userId}/${device.deviceId}`;
+            subscribeToTopic(recentAccessTopic);
+            console.log(`Subscribed to default topics for device: ${device.deviceId}, user: ${device.userId}`);
+        }
+    } catch (error) {
+        console.error('Error subscribing to default topics:', error);
+    }
+};
+
 export const connectToAWSIoT = () => {
-    device.on('connect', function() {
+    device.on('connect', async function() {
         console.log('Connected to AWS IoT Core');
+        
+        // Subscribe các topic mặc định
+        await subscribeDefaultTopics();
     });
 
     device.on('error', function(error) {
@@ -59,6 +78,7 @@ export const handleMessage = async (topic, payload) => {
         });
 
         if (topic.startsWith('smartlock/')) {
+
             const { deviceId, userId, lockState, timestamp } = message;
             
             const updatedDevice = await updateDeviceState(deviceId, lockState, timestamp);
@@ -71,7 +91,6 @@ export const handleMessage = async (topic, payload) => {
                     timestamp,
                     type: 'STATE_CHANGE'
                 };
-
                 notifyAll('deviceStateChange', notificationData);
                 console.log(`Updated device state and sent notification for device: ${deviceId}`);
             } else {
@@ -410,7 +429,43 @@ export const handleMessage = async (topic, payload) => {
                 console.log(`RFID card already exists error sent to frontend for card: ${cardUID}`);
             }
         }
+
+        if (topic.startsWith('recentAccess-smartlock/')) {
+            const { userId, deviceId, userName, method, status, notes } = message;
+            
+            console.log(`Received recent access message for userId: ${userId}, deviceId: ${deviceId}, method: ${method}, status: ${status}, notes: ${notes}`);
+
+            let accessType;
+            switch(method) {
+                case 'FACEID':
+                    accessType = 'FACE_ID';
+                    break;
+                case 'FINGERPRINT':
+                    accessType = 'FINGERPRINT';
+                    break;
+                case 'RFID':
+                    accessType = 'RFID';
+                    break;
+                case 'WEB_APP':
+                    accessType = 'WEB_APP';
+                    break;
+                default:
+                    accessType = 'FACE_ID'; // Mặc định là FACE_ID nếu không khớp
+            }
+            
+            const recentAccessLog = new RecentAccessLog({
+                userId,
+                deviceId,
+                userName,
+                accessType,
+                status: status,
+                notes: notes || 'No notes provided'
+            });
+
+            await recentAccessLog.save();
+            console.log(`Recent access log saved to database for userId: ${userId}, deviceId: ${deviceId}`);
+        }
     } catch (error) {
         console.error('Error processing message:', error);
     }   
-};
+}

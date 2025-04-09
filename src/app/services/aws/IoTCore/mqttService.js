@@ -1,5 +1,4 @@
-import { subscribeToTopic, publishMessage } from '../../util/AWSIoTCore.js';
-import { notifyAll, notifyUser } from '../../config/websocket/index.js';
+import { subscribeToTopic, publishMessage } from '../../../../util/AWSIoTCore.js';
 
 export const sendDeviceCommandLockState = async (device, lockState) => {
     try {

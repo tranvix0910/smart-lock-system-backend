@@ -62,3 +62,5 @@ aws-credentials.json
 
 # System Files
 Thumbs.db 
+
+src/certs/

@@ -1,5 +1,5 @@
 import Device from '../models/Device.js';
-import { sendDeviceCommandLockState, sendDeviceCommandConnect } from '../services/mqttService.js';
+import { sendDeviceCommandLockState, sendDeviceCommandConnect } from '../services/aws/IoTCore/mqttService.js';
 import { publishMessage, subscribeToTopic } from '../../util/AWSIoTCore.js';
 
 // [POST] /api/devices/create-device

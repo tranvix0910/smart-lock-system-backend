@@ -11,15 +11,7 @@ const recentAccessLogsSchema = new mongoose.Schema({
         required: true,
         ref: 'Device'
     },
-    deviceName: {
-        type: String,
-        required: true
-    },
     userName: {
-        type: String,
-        required: true
-    },
-    location: {
         type: String,
         required: true
     },
@@ -31,16 +23,19 @@ const recentAccessLogsSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['SUCCESS', 'FAILED']
+        enum: ['SUCCESS', 'FAILED', 'AUTHENTICATION SUCCESS', 'AUTHENTICATION FAILED']
     },
-    imageUrl: {
+    notes: {
         type: String,
-        required: false,
-        default: null
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 }, {
     timestamps: true,
-    collection: 'recent-access-logs'
+    collection: 'recentAccessLogs'
 });
 
 const RecentAccessLogs = mongoose.model('RecentAccessLogs', recentAccessLogsSchema);

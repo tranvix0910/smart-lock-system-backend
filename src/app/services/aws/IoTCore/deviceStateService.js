@@ -1,4 +1,4 @@
-import Device from '../models/Device.js';
+import Device from '../../../models/Device.js';
 
 export const updateDeviceState = async (deviceId, lockState, timestamp) => {
     try {
