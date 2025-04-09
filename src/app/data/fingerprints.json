@@ -1,0 +1,102 @@
+[
+  {
+    "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+    "deviceId": "SMTV-1580",
+    "faceId": "0127aada-9f96-4640-a8d8-3a57d370d8e8",
+    "userName": "Tran Dai Vi",
+    "fingerprintId": "fp_001",
+    "fingerprintTemplate": "AQKqAeJeJtJWyT3qJ1iJvG1aAQDnAQCAJpHaAKKWQFr7VK1cKyW+Mj9RP3bKOKsgIhGXXj6pPuJSRgKwALRsZVJSNyI8FHk7TXYdJELnKkL+IEV9AGtHK2T1HUJ8SWpMAHl/Ml35MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHmRUlZRIUKpTSp8KT15YW16PEm5PlXATUmsXkp+AED3UWFoQEZxWllVPF40WFZbXF04OVE+REY5TjZzQDdfRjdAPTJTPV4+",
+    "createdAt": "2024-06-15T08:30:00.000Z",
+    "updatedAt": "2024-06-15T08:30:00.000Z"
+  },
+  {
+    "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+    "deviceId": "SMTV-1580",
+    "faceId": "3a1fb372-c2d3-4f19-b7e5-a6c87d5e90a3",
+    "userName": "Tran Dai Vi",
+    "fingerprintId": "fp_002",
+    "fingerprintTemplate": "BSKeUdJeJ5RlyA8qJziTvGxdAQZnAQCAJtHaSKKWYFr9VK5fKzW+Mz9RP3fKOKsjIhGXXz6qPuNSRgKxALVsZlJTNyI8FHk8TXYdJULnKkL+IEV9AGtHK2T1HUJ8SWpMAHl/Ml36MkxzSSFYMjZOOVB7AgD8AQCAYIp9GHmRU1ZRIUKqTSp8KT15YW16PEm6PlXATUmtXkp+AED3UWFpQEZxWllVPF41WFZbXF05OVI+REY5TjdzQDdfRjdAPTJTPV4/",
+    "createdAt": "2024-06-16T09:45:00.000Z",
+    "updatedAt": "2024-06-16T09:45:00.000Z"
+  },
+  {
+    "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+    "deviceId": "SMTV-1581",
+    "faceId": "0127aada-9f96-4640-a8d8-3a57d370d8e8",
+    "userName": "Tran Dai Vi",
+    "fingerprintId": "fp_003",
+    "fingerprintTemplate": "CQJqAaTeJtJPyT8qJ1iJxG1aAQZnAQCAJpJaAKKWYFr7VK1cKyS+Mj9QP3bKOKsgIhGYXj6pPuJSRgKwALVsZVJSNyM8FHk7TXYdJELnKkP+IEV9AGtHK2T1HUJ8SWpMAHl/Ml36MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHmRUlZQIUKpTSp8KT15YW17PEm5PlXATUmsXkp+AED3UWFoQEZxWllVPF40WFZbXF05OVE+REY5TjZzQDdfRjdAPTJUPV4+",
+    "createdAt": "2024-06-17T14:20:00.000Z",
+    "updatedAt": "2024-06-17T14:20:00.000Z"
+  },
+  {
+    "userId": "88b272fb-3530-4e2c-bc32-b7c0904a72bc",
+    "deviceId": "SMTV-1580",
+    "faceId": "5df12f6b-89ac-42e1-9c5a-0e94d8514d62",
+    "userName": "Nguyen Van A",
+    "fingerprintId": "fp_004",
+    "fingerprintTemplate": "DQKqAcGeJsJWyU3qJ5iJvF1aARDnAQCAJpHaAKSWQFr7VG1cKyW+Mj9RP3bKOGsgIhGXXj6pPuJSRgKwALRsZVJSNyI8FXk7TXYdJELnKkL+IEZ9AGtHK2T1HUJ8SmpMAHp/M135MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHqRUlZRIUKpTSp8KT16YW16PEm5PlXATUmsXkp+AED3UmFoQEZxWllVPF40WFZbXF04OVE+REY6TjZzQDdfRjdAPTJTPV4+",
+    "createdAt": "2024-06-18T10:10:00.000Z",
+    "updatedAt": "2024-06-18T10:10:00.000Z"
+  },
+  {
+    "userId": "88b272fb-3530-4e2c-bc32-b7c0904a72bc",
+    "deviceId": "SMTV-1582",
+    "faceId": "e723af19-6d78-4c32-b8f0-1e9b4a57d2fd",
+    "userName": "Nguyen Van A",
+    "fingerprintId": "fp_005",
+    "fingerprintTemplate": "EQKyAaTeJtJWyS3qJ1iKvG1aAQDnAQCAJpHaAKKWQFr7VK1cKyW+Mj9RP3bKOKsgIhGXXj6pPuJSRgKwALRsZVNSNyI8FHk7TXYdJELnKkL+IEV9AGxHK2T1HUJ8SWpMAHl/Ml35MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHmRUlZRIUKpTSp8KT15YW16PEm5PlXATUmsXkp+AED3UWFoQEZxWllWPF40WFZbXF04OVE+REY5TjZzQDdfRjdAPTJTPV4+",
+    "createdAt": "2024-06-19T16:35:00.000Z",
+    "updatedAt": "2024-06-19T16:35:00.000Z"
+  },
+  {
+    "userId": "57ac9357-d1a2-4b8f-9e6c-d8f5a32b0e17",
+    "deviceId": "SMTV-1583",
+    "faceId": "9b421c83-6f5e-47d8-a9b0-3e7c8f215d49",
+    "userName": "Le Thi B",
+    "fingerprintId": "fp_006",
+    "fingerprintTemplate": "FQMbAcJeJtJWyT3qJ1iJvK1aAQDnAQCAJpHbAKKWQFr7VK1cKyW+Mj9RP3bLOKsgIhGXXj6pPuNSRgKwALRsZVJSNyI8FHk7TXYeJELnKkL+IEV9AGtHK2T1HUJ8SWpMAHl/Ml35MkxzSSFYMjZPOVB6AgD8AQCAYIp8GHmRUlZRIUKpTSp8KT15YW16PEm5PlXATUmsXkp+AED3UWFoQEZxWllVPF40WFZbXF04OVE+REY5TjZzQDdfRjdAPTJTPV4+",
+    "createdAt": "2024-06-20T11:25:00.000Z",
+    "updatedAt": "2024-06-20T11:25:00.000Z"
+  },
+  {
+    "userId": "57ac9357-d1a2-4b8f-9e6c-d8f5a32b0e17",
+    "deviceId": "SMTV-1583",
+    "faceId": "c5d8e472-3b9f-4a61-87c3-0f4e15d92a83",
+    "userName": "Le Thi B",
+    "fingerprintId": "fp_007",
+    "fingerprintTemplate": "GfKpAaFeJtJWyT3qJ1iJvG1aAQDnAQCAJpHaAKKWQFr7VK1cKyW+Mj9RP3bKOKsgIhGXXj6pPuJSRgKwALRsZVJSNyI8FHk7TXYdJELnKkL+IEZ9AGtHK2T1HUJ8SWpMAHl/Ml36MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHmRUlZRIUKpTSp8KT15YW16PEm5PlXATUmsXkp+AED3UWFoQEZxWllVPF40WFZbXF04OVE+REY5TjZzQDhfRjdAPTJTPV4+",
+    "createdAt": "2024-06-21T08:50:00.000Z",
+    "updatedAt": "2024-06-21T08:50:00.000Z"
+  },
+  {
+    "userId": "42e59c78-2a4d-498e-9f3b-5d87b6e95e29",
+    "deviceId": "SMTV-1584",
+    "faceId": "7f4b1d59-3e2c-4a8f-b7d6-9c5e2f1a3b84",
+    "userName": "Pham Van C",
+    "fingerprintId": "fp_008",
+    "fingerprintTemplate": "HKZmAeJeJtJWyT3qJ1iJvG1aAQDnAQCAJpHaAKKWQFr7VK1cKyW+Mj9RP3bKOKsgIhGXXj6pPuJSRgKwALRsZVJSNyI8FHk7TXYdJELnKkL+IEV9AGtHK2T1HUN8SWpMAHl/Ml35MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHmRUlZRIUKpTSp8KT15YW16PEm5PlXATUmsXkp+AED3UWFoQEZxWllVPF40WFZbXF04OVE+REY5TjZzQDdfRjdAPTJTPV4+",
+    "createdAt": "2024-06-22T13:15:00.000Z",
+    "updatedAt": "2024-06-22T13:15:00.000Z"
+  },
+  {
+    "userId": "42e59c78-2a4d-498e-9f3b-5d87b6e95e29",
+    "deviceId": "SMTV-1585",
+    "faceId": "d3c2b1a0-9e8d-7f6e-5d4c-3b2a1098f7e6",
+    "userName": "Pham Van C",
+    "fingerprintId": "fp_009",
+    "fingerprintTemplate": "ILKqAeJeJtJWyT3qJ1iJvG1aAQDnAQCAJpHaAKKWQFr7VK1cKyW+Mj9RP3bKOKsgIhGXXj6pPuJSRgKwALRsZVJSNyI8FHk7TXYdJELnKkL+IEV9AGtHK2T1HUJ8SWpMAHl/Ml35MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHmRUlZRIUKpTSp8KT15YW16PEm5PlbATUmsXkp+AED3UWFoQEZxWllVPF40WFZbXF04OVE+REY5TjZzQDdfRjdAPTJTPV4+",
+    "createdAt": "2024-06-23T17:40:00.000Z",
+    "updatedAt": "2024-06-23T17:40:00.000Z"
+  },
+  {
+    "userId": "1f2e3d4c-5b6a-7980-8f7e-6d5c4b3a2910",
+    "deviceId": "SMTV-1586",
+    "faceId": "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6",
+    "userName": "Tran Thi D",
+    "fingerprintId": "fp_010",
+    "fingerprintTemplate": "JFaBgdJeJtJWyT3qJ1iJvG1aAQDnAQCAJpHaAKKWQFr7VK1cKyW+Mj9RP3bKOKsgIhGXXj6pPuJSRgKwALRsZVJSNyI8FHk7TXYdJELnKkL+IEV9AGtHK2T1HUJ8SWpMAHl/Ml35MkxzSSFYMjZOOVB6AgD8AQCAYIp8GHmRUlZRIUKpTSp8KT15YW16PEm5PlXATUmsXkp+AED3UWFoQEZxWllVPF40WFZbXF04OVE+REY5TjZzQDdfRjdAPTJTPV4+",
+    "createdAt": "2024-06-24T09:05:00.000Z",
+    "updatedAt": "2024-06-24T09:05:00.000Z"
+  }
+] 

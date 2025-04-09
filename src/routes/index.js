@@ -4,6 +4,7 @@ import rekognitionRoutes from './rekognition.js';
 import faceIdRoutes from './faceId.js';
 import s3Routes from './s3.js';
 import fingerprintRoutes from './fingerprint.js';
+import rfidRoutes from './rfid.js';
 
 export default function routes(app) {
     app.use('/api/devices', deviceRoutes);
@@ -12,4 +13,5 @@ export default function routes(app) {
     app.use('/api/face-id', faceIdRoutes);
     app.use('/api/s3', s3Routes);
     app.use('/api/fingerprint', fingerprintRoutes);
+    app.use('/api/rfid', rfidRoutes);
 }

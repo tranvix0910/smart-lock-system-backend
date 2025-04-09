@@ -6,7 +6,7 @@ export const requestAddFingerid = async (req, res) => {
     try {
 
         const { userId, deviceId } = req.params;
-        const { faceId } = req.body;
+        const { faceId, notes } = req.body;
         
         if (!userId || !deviceId) {
             return res.status(400).json({
@@ -14,6 +14,7 @@ export const requestAddFingerid = async (req, res) => {
                 message: 'userId and deviceId are required'
             });
         }
+
         const topicSubscribe = `addFingerprint-smartlock/${userId}/${deviceId}`;
         const topicPublish = `addFingerprint-server/${userId}/${deviceId}`;
         subscribeToTopic(topicSubscribe);
@@ -85,30 +86,32 @@ export const getFingerprint = async (req, res) => {
     }
 };
 
-// [DELETE] /api/fingerprint/delete-fingerprint/:userId/:fingerprintId
-export const deleteFingerprint = async (req, res) => {
+// [DELETE] /api/fingerprint/delete-fingerprint-request/:userId/:deviceId/:fingerprintId
+export const deleteFingerprintRequest = async (req, res) => {
     try {
-        const { userId, fingerprintId } = req.params;
+        const { userId, deviceId, fingerprintId } = req.params;
+        const { faceId } = req.body;
         
-        if (!userId || !fingerprintId) {
+        if (!userId || !deviceId || !fingerprintId || !faceId) {
             return res.status(400).json({
                 success: false,
-                message: 'userId and fingerprintId are required'
+                message: 'userId, deviceId, fingerprintId and faceId are required'
             });
         }
-        
-        const result = await Fingerprint.deleteOne({ userId, fingerprintId });
-        
-        if (result.deletedCount === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'Fingerprint not found'
 
-            });
-        }
+        const topicSubscribe = `deleteFingerprint-smartlock/${userId}/${deviceId}`;
+        subscribeToTopic(topicSubscribe);
+
+        const topicPublish = `deleteFingerprint-server/${userId}/${deviceId}`;
+        publishMessage(topicPublish, {
+            fingerprintId,
+            faceId,
+            mode: 'DELETE FINGERPRINT REQUEST FROM SERVER'
+        });
         return res.status(200).json({
             success: true,
-            message: 'Fingerprint deleted successfully'
+            message: 'Fingerprint request delete successfully',
+            topicSubscribe
         });
     } catch (error) {
         console.error('Error in deleteFingerprint:', error);
