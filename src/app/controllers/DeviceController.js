@@ -5,7 +5,7 @@ import { publishMessage, subscribeToTopic } from '../../util/AWSIoTCore.js';
 // [POST] /api/devices/create-device
 export const createDevice = async (req, res) => {
     try {
-        const { userId, deviceId, macAddress, secretKey, deviceName, location } = req.body;
+        const { userId, deviceId, macAddress, secretKey, deviceName, location, userName } = req.body;
 
         if (!userId || !deviceId || !macAddress || !secretKey) {
             return res.status(400).json({
@@ -40,6 +40,7 @@ export const createDevice = async (req, res) => {
             secretKey,
             deviceName, 
             location,
+            userName,
             batteryLevel: 100,
         });
         

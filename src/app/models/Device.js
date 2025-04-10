@@ -23,6 +23,10 @@ const deviceSchema = new mongoose.Schema({
         type: String,
         default: 'Smart Lock'
     },
+    userName: {
+        type: String,
+        default: 'N/A'
+    },
     location: {
         type: String,
         default: 'Home'

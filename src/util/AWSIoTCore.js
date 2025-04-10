@@ -431,7 +431,7 @@ export const handleMessage = async (topic, payload) => {
         }
 
         if (topic.startsWith('recentAccess-smartlock/')) {
-            const { userId, deviceId, userName, method, status, notes } = message;
+            const { userId, deviceId, userName: originalUserName, method, status, notes } = message;
             
             console.log(`Received recent access message for userId: ${userId}, deviceId: ${deviceId}, method: ${method}, status: ${status}, notes: ${notes}`);
 
@@ -450,13 +450,24 @@ export const handleMessage = async (topic, payload) => {
                     accessType = 'WEB_APP';
                     break;
                 default:
-                    accessType = 'FACE_ID'; // Mặc định là FACE_ID nếu không khớp
+                    accessType = 'Unknown';
+            }
+
+            // Xử lý userName
+            let logUserName = originalUserName;
+            if (logUserName === null) {
+                logUserName = 'Unknown User';
+            } else if (logUserName === "ACCOUNT USER") {
+                const device = await Device.findOne({ deviceId });
+                if (device) {
+                    logUserName = device.userName || 'Account';
+                }
             }
             
             const recentAccessLog = new RecentAccessLog({
                 userId,
                 deviceId,
-                userName,
+                userName: logUserName,
                 accessType,
                 status: status,
                 notes: notes || 'No notes provided'

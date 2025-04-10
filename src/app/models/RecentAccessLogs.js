@@ -22,8 +22,7 @@ const recentAccessLogsSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        required: true,
-        enum: ['SUCCESS', 'FAILED', 'AUTHENTICATION SUCCESS', 'AUTHENTICATION FAILED']
+        required: true
     },
     notes: {
         type: String,

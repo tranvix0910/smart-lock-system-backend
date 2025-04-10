@@ -1,0 +1,108 @@
+[{
+  "_id": {
+    "$oid": "67f6b1f5f2eeeff823a8749e"
+  },
+  "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+  "deviceId": "SMTV-1580",
+  "userName": "TranDaiVi",
+  "accessType": "FACE_ID",
+  "status": "SUCCESS",
+  "notes": "Liveness Check Passed",
+  "createdAt": {
+    "$date": "2025-04-09T17:44:21.898Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T17:44:21.898Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6b217f2eeeff823a874a0"
+  },
+  "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+  "deviceId": "SMTV-1580",
+  "userName": "1",
+  "accessType": "FINGERPRINT",
+  "status": "SUCCESS",
+  "notes": "Access Granted",
+  "createdAt": {
+    "$date": "2025-04-09T17:44:55.379Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T17:44:55.379Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6b22df2eeeff823a874a4"
+  },
+  "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+  "deviceId": "SMTV-1580",
+  "userName": "1",
+  "accessType": "FINGERPRINT",
+  "status": "SUCCESS",
+  "notes": "Access Granted",
+  "createdAt": {
+    "$date": "2025-04-09T17:45:17.125Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T17:45:17.125Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6b236f2eeeff823a874a6"
+  },
+  "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+  "deviceId": "SMTV-1580",
+  "userName": "Unknown",
+  "accessType": "FINGERPRINT",
+  "status": "FAILED",
+  "notes": "Access Denied",
+  "createdAt": {
+    "$date": "2025-04-09T17:45:26.725Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T17:45:26.725Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6b9b9302268027d12e495"
+  },
+  "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+  "deviceId": "SMTV-1580",
+  "userName": "Tran Dai Vi",
+  "accessType": "WEB_APP",
+  "status": "UNLOCK",
+  "notes": "Accessed Via Web App",
+  "createdAt": {
+    "$date": "2025-04-09T18:17:29.399Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T18:17:29.399Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67f6b9c0302268027d12e499"
+  },
+  "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+  "deviceId": "SMTV-1580",
+  "userName": "Tran Dai Vi",
+  "accessType": "WEB_APP",
+  "status": "LOCK",
+  "notes": "Accessed Via Web App",
+  "createdAt": {
+    "$date": "2025-04-09T18:17:36.527Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-09T18:17:36.527Z"
+  },
+  "__v": 0
+}]
