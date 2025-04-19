@@ -19,6 +19,8 @@ const subscribeDefaultTopics = async () => {
         for (const device of devices) {
             const recentAccessTopic = `recentAccess-smartlock/${device.userId}/${device.deviceId}`;
             subscribeToTopic(recentAccessTopic);
+            const imageUploadTopic = `uploadImage-lambda/${device.userId}/${device.deviceId}`;
+            subscribeToTopic(imageUploadTopic);
             console.log(`Subscribed to default topics for device: ${device.deviceId}, user: ${device.userId}`);
         }
     } catch (error) {
@@ -456,18 +458,35 @@ export const handleMessage = async (topic, payload) => {
                     logUserName = device.userName || 'Account';
                 }
             }
-            
-            const recentAccessLog = new RecentAccessLog({
+
+            // Find the most recent PENDING log for this user and device
+            const recentLog = await RecentAccessLog.findOne({
                 userId,
                 deviceId,
-                userName: logUserName,
                 accessType,
-                status: status,
-                notes: notes || 'No notes provided'
-            });
+                status: 'PENDING'
+            }).sort({ createdAt: -1 });
 
-            await recentAccessLog.save();
-            console.log(`Recent access log saved to database for userId: ${userId}, deviceId: ${deviceId}`);
+            if (recentLog) {
+                // Update the existing log with new information
+                recentLog.userName = logUserName;
+                recentLog.status = status;
+                recentLog.notes = notes || 'No notes provided';
+                await recentLog.save();
+                console.log(`Updated existing RecentAccessLog with additional information`);
+            } else {
+                // If no pending log found, create a new one
+                const newLog = new RecentAccessLog({
+                    userId,
+                    deviceId,
+                    userName: logUserName,
+                    accessType,
+                    status: status,
+                    notes: notes || 'No notes provided'
+                });
+                await newLog.save();
+                console.log(`Created new RecentAccessLog entry`);
+            }
         }
 
         if (topic.startsWith('deleteRFIDCard-smartlock/')) {
@@ -578,6 +597,24 @@ export const handleMessage = async (topic, payload) => {
                 console.error('Error processing unlock system message:', error);
             }
         }
+
+        if (topic.startsWith('uploadImage-lambda/')) {
+            const { userId, deviceId, filePath } = message;
+            console.log(`Received image upload message: ${JSON.stringify(message)}`);
+            const recentAccessLog = new RecentAccessLog({
+                userId,
+                deviceId,
+                userName: 'Unknown User',
+                accessType: 'FACE_ID',
+                status: 'PENDING',
+                notes: 'No notes provided',
+                filePath: filePath
+            });
+
+            await recentAccessLog.save();
+            console.log(`Created new RecentAccessLog entry with filePath: ${filePath}`);
+        }
+
     } catch (error) {
         console.error('Error processing message:', error);
     }   

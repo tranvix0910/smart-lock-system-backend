@@ -28,6 +28,10 @@ const recentAccessLogsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    filePath: {
+        type: String,
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now
