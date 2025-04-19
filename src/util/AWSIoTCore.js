@@ -30,7 +30,6 @@ export const connectToAWSIoT = () => {
     device.on('connect', async function() {
         console.log('Connected to AWS IoT Core');
         
-        // Subscribe các topic mặc định
         await subscribeDefaultTopics();
     });
 
@@ -109,7 +108,7 @@ export const handleMessage = async (topic, payload) => {
                     deviceId: deviceId,
                     status: 'DELETE ACCEPTED FROM CLIENT',
                     timestamp: timestamp
-                });
+                }); 
             }
         }
 
@@ -385,13 +384,11 @@ export const handleMessage = async (topic, payload) => {
                         status: 'SUCCESS'
                     });
 
-                    // Clean up the stored request
                     rfidRequests.delete(requestKey);
     
                 } catch (error) {
                     console.error('Error saving RFID card data:', error);
-                    
-                    // Notify frontend of error
+
                     notifyAll('rfidCardSaved', {
                         userId: effectiveUserId,
                         deviceId: effectiveDeviceId,
@@ -405,25 +402,21 @@ export const handleMessage = async (topic, payload) => {
             if(mode === 'ADD RFID CARD FAILED: CARD ALREADY EXISTS'){
                 console.log(`RFID Card already exists: ${JSON.stringify(message)}`);
                 
-                // Lấy thông tin từ tin nhắn
                 const { cardUID, uidLength } = message;
                 
-                // Tìm thông tin yêu cầu ban đầu
                 const requestKey = `rfid-${effectiveUserId}-${effectiveDeviceId}`;
                 const originalMessage = rfidRequests.get(requestKey);
                 
-                // Gửi thông báo lỗi đến frontend
                 notifyAll('rfidCardSaved', {
                     userId: effectiveUserId,
                     deviceId: effectiveDeviceId,
                     faceId: originalMessage?.faceId,
-                    rfidId: 'N/A',
-                    rfidIdLength: 'N/A',
+                    rfidId: cardUID,
+                    rfidIdLength: uidLength,
                     status: 'ERROR',
                     error: 'RFID_CARD_ALREADY_EXISTS',
                 });
                 
-                // Xóa request đã lưu
                 rfidRequests.delete(requestKey);
                 
                 console.log(`RFID card already exists error sent to frontend for card: ${cardUID}`);
@@ -476,7 +469,117 @@ export const handleMessage = async (topic, payload) => {
             await recentAccessLog.save();
             console.log(`Recent access log saved to database for userId: ${userId}, deviceId: ${deviceId}`);
         }
+
+        if (topic.startsWith('deleteRFIDCard-smartlock/')) {
+
+            const { faceId, rfidId, mode, timestamp } = message;
+
+            if (mode === 'DELETE RFID CARD ACCEPTED') {
+                console.log(`Client accepted delete RFID card request: ${JSON.stringify(message)}`);
+                notifyAll('deleteRFIDCardConfirmFromClient', {
+                    faceId: faceId,
+                    rfidId: rfidId,
+                    status: 'DELETE ACCEPTED FROM CLIENT',
+                    timestamp: timestamp
+                });
+            }
+
+            if (mode === 'REMOVE RFID CARD SUCCESS') {
+                try {
+                    console.log(`RFID Card deletion message received: ${JSON.stringify(message)}`);
+                    
+                    const rfidIdToDelete = rfidId || message.cardUID;
+                    
+                    if (!rfidIdToDelete) {
+                        console.error('No RFID ID value found in delete message');
+                        return;
+                    }
+                    
+                    const deletedRFIDCard = await RFIDCard.findOneAndDelete({ rfidId: rfidIdToDelete });
+                    
+                    if (!deletedRFIDCard) {
+                        console.error(`No RFID card found with ID: ${rfidIdToDelete}`);
+                        notifyAll('rfidCardDeleted', {
+                            rfidId: rfidIdToDelete,
+                            status: 'ERROR',
+                            error: 'RFID card not found in database'
+                        });
+                        return;
+                    }
+                    
+                    console.log(`RFID card deleted from database: ${rfidIdToDelete}`);
+                    
+                    notifyAll('rfidCardDeleted', {
+                        userId: deletedRFIDCard.userId,
+                        deviceId: deletedRFIDCard.deviceId,
+                        faceId: deletedRFIDCard.faceId,
+                        userName: deletedRFIDCard.userName,
+                        rfidId: rfidIdToDelete,
+                        status: 'SUCCESS'
+                    });
+                    
+                } catch (error) {
+                    console.error('Error deleting RFID card data:', error);
+                    
+                    // Gửi thông báo lỗi đến frontend
+                    notifyAll('rfidCardDeleted', {
+                        rfidId: rfidId || message.rfidId,
+                        status: 'ERROR',
+                        error: error.message
+                    });
+                }
+            }
+        }
+
+        if (topic.startsWith('unlockSystem-smartlock/')) {
+            try {
+                const { userId, deviceId, mode, timestamp } = message;
+                
+                console.log(`Received unlock system message: ${JSON.stringify(message)}`);
+                
+                const device = await Device.findOne({ deviceId });
+                
+                if (!device) {
+                    console.error(`Device not found: ${deviceId}`);
+                    return;
+                }
+                
+                if (mode === 'EMERGENCY LOCK SYSTEM') {
+                    device.systemLocked = true;
+                    device.systemLockedAt = new Date();
+                    await device.save();
+                    
+                    console.log(`System locked for device: ${deviceId}`);
+                    
+                    notifyAll('systemLocked', {
+                        userId,
+                        deviceId,
+                        systemLocked: true,
+                        timestamp: timestamp || new Date(),
+                        mode: 'SYSTEM LOCKED'
+                    });
+
+                } else if (mode === 'UNLOCK SYSTEM SUCCESS') {
+                    device.systemLocked = false;
+                    device.systemLockedAt = null;
+                    await device.save();
+                    
+                    console.log(`System unlocked for device: ${deviceId}`);
+                    
+                    notifyAll('systemUnlocked', {
+                        userId,
+                        deviceId,
+                        systemLocked: false,
+                        timestamp: timestamp || new Date(),
+                        mode: 'SYSTEM UNLOCKED'
+                    });
+                }
+            } catch (error) {
+                console.error('Error processing unlock system message:', error);
+            }
+        }
     } catch (error) {
         console.error('Error processing message:', error);
     }   
 }
+

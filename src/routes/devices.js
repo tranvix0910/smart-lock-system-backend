@@ -5,7 +5,8 @@ import {
     createDevice, 
     updateDevice, 
     deleteDeviceRequest,
-    deleteDevice
+    deleteDevice,
+    unlockDevice
 } from '../app/controllers/DeviceController.js';
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get('/delete-device-request/:userId/:deviceId', deleteDeviceRequest);
 router.get('/:userId', getDeviceByUserId);
 router.put('/:deviceId/state', changeDeviceState);
 router.put('/:userId/:deviceId/update', updateDevice);
+router.post('/unlock-device/:userId/:deviceId', unlockDevice);
 
 export default router;

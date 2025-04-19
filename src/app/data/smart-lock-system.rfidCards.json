@@ -1,0 +1,19 @@
+[{
+  "_id": {
+    "$oid": "67f5368da6f04a0939960c42"
+  },
+  "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+  "deviceId": "SMTV-1580",
+  "faceId": "0127aada-9f96-4640-a8d8-3a57d370d8e8",
+  "userName": "Tran Dai Vi",
+  "rfidId": "E1:3F:1B:03",
+  "rfidIdLength": 4,
+  "notes": "",
+  "createdAt": {
+    "$date": "2025-04-08T14:45:33.025Z"
+  },
+  "updatedAt": {
+    "$date": "2025-04-08T14:45:33.025Z"
+  },
+  "__v": 0
+}]

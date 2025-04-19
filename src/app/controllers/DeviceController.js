@@ -14,7 +14,6 @@ export const createDevice = async (req, res) => {
             });
         }
 
-        // Check if device already exists
         let existingDevice = await Device.findOne({ deviceId });
         if (existingDevice) {
             return res.status(400).json({
@@ -23,7 +22,6 @@ export const createDevice = async (req, res) => {
             }); 
         }
 
-        // Check if MAC address already exists
         existingDevice = await Device.findOne({ macAddress });
         if (existingDevice) {
             return res.status(400).json({   
@@ -32,7 +30,6 @@ export const createDevice = async (req, res) => {
             });
         }
 
-        // Create new device
         const newDevice = new Device({ 
             userId, 
             deviceId, 
@@ -94,7 +91,9 @@ export const getDeviceByUserId = async (req, res) => {
             location: device.location,
             lockState: device.lockState,
             macAddress: device.macAddress,
-            status: device.status
+            status: device.status,
+            systemLocked: device.systemLocked,
+            systemLockedAt: device.systemLockedAt
         }));
 
         res.status(200).json({
@@ -210,13 +209,22 @@ export const deleteDeviceRequest = async (req, res) => {
             });
         }   
 
-        const topic = `smartlock-delete/${userId}/${deviceId}`;
-        subscribeToTopic(topic);
+        const topicSubscribe = `smartlock-delete/${userId}/${deviceId}`;
+        const topicPublish = `server-delete/${userId}/${deviceId}`;
+
+        subscribeToTopic(topicSubscribe);
+        publishMessage(topicPublish, {
+            userId: userId,
+            deviceId: deviceId,
+            mode: 'DELETE DEVICE REQUEST',
+            timestamp: new Date().toISOString()
+        });
 
         res.status(200).json({
             success: true,
             message: 'Device deletion request sent successfully'
         });
+        
     } catch (error) {
         console.error('Delete device request error:', error);
         res.status(500).json({
@@ -261,6 +269,56 @@ export const deleteDevice = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Server error when deleting device',
+            error: error.message
+        });
+    }
+};
+
+// [POST] /api/devices/unlock-device/:userId/:deviceId
+export const unlockDevice = async (req, res) => {
+    try {
+        const { userId, deviceId } = req.params;
+        const { faceId } = req.body;
+
+        if (!userId || !deviceId) {
+            return res.status(400).json({
+                success: false,
+                message: 'userId and deviceId are required'
+            });
+        }
+
+        const device = await Device.findOne({ deviceId, userId });
+        
+        if (!device) {
+            return res.status(404).json({
+                success: false,
+                message: 'Device not found'
+            });
+        }
+        
+        const unlockSystemTopic = `unlockSystem-smartlock/${userId}/${deviceId}`;
+        subscribeToTopic(unlockSystemTopic);
+        
+        const publishTopic = `unlockSystem-server/${userId}/${deviceId}`;
+        publishMessage(publishTopic, {
+            faceId: faceId,
+            mode: 'UNLOCK SYSTEM REQUEST FROM SERVER'
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Unlock request sent to device successfully',
+            data: {
+                deviceId,
+                userId,
+                requestTime: device.lastUnlockRequest
+            }
+        });
+    } catch (error) {
+        console.error('Error sending unlock request:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error sending unlock request',
             error: error.message
         });
     }

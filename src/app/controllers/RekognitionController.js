@@ -1,17 +1,19 @@
 import { RekognitionClient, CreateCollectionCommand, IndexFacesCommand, DeleteFacesCommand } from '@aws-sdk/client-rekognition';
 import FaceID from '../models/FaceID.js';
 import { uploadImageToS3 } from './S3Controller.js';
+import Fingerprint from '../models/Fingerprint.js';
+import RFIDCard from '../models/RFID.js';
 
 const REGION = 'ap-southeast-1';
 const SOURCE_BUCKET = 'smart-door-system';
 
 const formatExternalImageId = (userName) => {
     return userName
-        .normalize('NFD') // Tách dấu tiếng Việt
-        .replace(/[\u0300-\u036f]/g, '') // Loại bỏ dấu tiếng Việt
-        .replace(/\s+/g, '') // Thay thế khoảng trắng bằng dấu gạch ngang
-        .replace(/[^a-zA-Z0-9_.\-:]/g, '') // Chỉ giữ lại các ký tự hợp lệ
-        .replace(/^-+|-+$/g, ''); // Xóa dấu gạch ngang ở đầu và cuối
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '')
+        .replace(/[^a-zA-Z0-9_.\-:]/g, '')
+        .replace(/^-+|-+$/g, '');
 };
 
 const rekogClient = new RekognitionClient({
@@ -38,13 +40,10 @@ export const IndexFace = async (req, res) => {
             });
         }
 
-        // Tạo key cho ảnh
         const timestamp = Date.now();
-        // Sử dụng tên file gốc hoặc định dạng mới
         const imageKey = `users/${userId}/faces/${deviceId}/${image.name}`;
         
         try {
-            // Upload ảnh lên S3
             const uploadResult = await uploadImageToS3({ 
                 bucket: SOURCE_BUCKET, 
                 userName, 
@@ -62,7 +61,6 @@ export const IndexFace = async (req, res) => {
             const formattedUserName = formatExternalImageId(userName);
             console.log('Formatted userName:', formattedUserName);
 
-            // Wait for 500ms to ensure the image is processed on S3
             await new Promise(resolve => setTimeout(resolve, 500));
 
             const indexParams = {
@@ -211,17 +209,64 @@ export const deleteFace = async (req, res) => {
             });
         }
 
+        const relatedFingerprints = await Fingerprint.find({ faceId });
+        const relatedRFIDs = await RFIDCard.find({ faceId });
+        const faceInfo = await FaceID.findOne({ faceId });
+
+        if (relatedFingerprints.length > 0 || relatedRFIDs.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: 'Cannot delete face. There are dependent components.',
+                data: {
+                    faceInfo: faceInfo ? {
+                        userName: faceInfo.userName,
+                        userId: faceInfo.userId,
+                        deviceId: faceInfo.deviceId,
+                        faceId: faceInfo.faceId
+                    } : null,
+                    relatedComponents: {
+                        fingerprints: {
+                            count: relatedFingerprints.length,
+                            items: relatedFingerprints.map(fp => ({
+                                fingerprintId: fp.fingerprintId,
+                                userName: fp.userName,
+                                deviceId: fp.deviceId
+                            }))
+                        },
+                        rfidCards: {
+                            count: relatedRFIDs.length, 
+                            items: relatedRFIDs.map(card => ({
+                                rfidId: card.rfidId,
+                                userName: card.userName,
+                                deviceId: card.deviceId
+                            }))
+                        }
+                    }
+                }
+            });
+        }
+
         const collectionId = `smartlock-${userId}-${deviceId}`;
         const command = new DeleteFacesCommand({
             CollectionId: collectionId,
             FaceIds: [faceId]
         }); 
         const response = await rekogClient.send(command);
+        
         await FaceID.deleteOne({ faceId });
+
         return res.status(200).json({
             success: true,
-            message: 'Face deleted successfully',
-            data: response
+            message: 'Face deleted successfully. No related components found.',
+            data: {
+                deletedFace: response,
+                faceInfo: faceInfo ? {
+                    userName: faceInfo.userName,
+                    userId: faceInfo.userId,
+                    deviceId: faceInfo.deviceId,
+                    faceId: faceInfo.faceId
+                } : null
+            }
         });
     } catch (error) {
         console.error('Error deleting face:', error);

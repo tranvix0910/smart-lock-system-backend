@@ -41,6 +41,13 @@ const deviceSchema = new mongoose.Schema({
         enum: ['LOCK', 'UNLOCK'],
         default: 'LOCK'
     },
+    systemLocked: {
+        type: Boolean,
+        default: false
+    },
+    systemLockedAt: {
+        type: Date,
+    },
     batteryLevel: {
         type: Number,
         min: 0,
