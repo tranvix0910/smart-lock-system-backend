@@ -1,0 +1,54 @@
+{
+    "fingerprints": [
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "SMTV-1580",
+            "faceId": "face1",
+            "userName": "John Doe",
+            "fingerprintId": "fp1",
+            "fingerprintTemplate": "template1",
+            "createdAt": "2024-04-11T00:00:00.000Z",
+            "updatedAt": "2024-04-11T00:00:00.000Z"
+        },
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "SMTV-1580",
+            "faceId": "face2",
+            "userName": "Jane Smith",
+            "fingerprintId": "fp2",
+            "fingerprintTemplate": "template2",
+            "createdAt": "2024-04-11T01:00:00.000Z",
+            "updatedAt": "2024-04-11T01:00:00.000Z"
+        },
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "SMTV-1580",
+            "faceId": "face3",
+            "userName": "Bob Johnson",
+            "fingerprintId": "fp3",
+            "fingerprintTemplate": "template3",
+            "createdAt": "2024-04-11T02:00:00.000Z",
+            "updatedAt": "2024-04-11T02:00:00.000Z"
+        },
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "SMTV-1580",
+            "faceId": "face4",
+            "userName": "Alice Brown",
+            "fingerprintId": "fp4",
+            "fingerprintTemplate": "template4",
+            "createdAt": "2024-04-11T03:00:00.000Z",
+            "updatedAt": "2024-04-11T03:00:00.000Z"
+        },
+        {
+            "userId": "39da459c-4001-704e-8a18-531c910c5e4b",
+            "deviceId": "SMTV-1580",
+            "faceId": "face5",
+            "userName": "Charlie Wilson",
+            "fingerprintId": "fp5",
+            "fingerprintTemplate": "template5",
+            "createdAt": "2024-04-11T04:00:00.000Z",
+            "updatedAt": "2024-04-11T04:00:00.000Z"
+        }
+    ]
+} 

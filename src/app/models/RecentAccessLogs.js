@@ -44,3 +44,4 @@ const recentAccessLogsSchema = new mongoose.Schema({
 const RecentAccessLogs = mongoose.model('RecentAccessLogs', recentAccessLogsSchema);
 
 export default RecentAccessLogs;
+
