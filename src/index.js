@@ -4,11 +4,9 @@ import morgan from 'morgan';
 import cors from 'cors';
 import { createServer } from "http";
 import fileUpload from 'express-fileupload';
-
 import routes from './routes/index.js';
 import db from './config/db/index.js';
 import { connectToAWSIoT } from './util/AWSIoTCore.js';
-
 import { initWebSocket } from './config/websocket/index.js';
 
 const app = express();
@@ -49,18 +47,26 @@ app.get('/status', (req, res) => {
     res.send({
         status: 'Server is running',
         env: process.env.NODE_ENV || 'development',
-        frontendUrl: process.env.FRONTEND_URL || 'not set'
+        frontendUrl: process.env.FRONTEND_URL || 'not set',
+        websocketInitialized: global.socketServerInitialized || false
     });
 });
+
+
 
 // Router
 routes(app);
 
-// Initialize WebSocket
-const socketServer = initWebSocket(httpServer);
-
-// Log when WebSocket server is initialized
-console.log(`WebSocket server initialized with CORS origin: ${process.env.FRONTEND_URL || '*'}`);
+// Initialize WebSocket with error handling
+let socketServer;
+try {
+    socketServer = initWebSocket(httpServer);
+    global.socketServerInitialized = true;
+    console.log(`WebSocket server initialized successfully with CORS origin: ${process.env.FRONTEND_URL || '*'}`);
+} catch (error) {
+    console.error('Error initializing WebSocket server:', error);
+    global.socketServerInitialized = false;
+}
 
 // Connect to AWS IoT Core
 connectToAWSIoT();
@@ -70,6 +76,8 @@ httpServer.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`CORS allowed origin: ${process.env.FRONTEND_URL || '*'}`);
+    console.log(`WebSocket initialized: ${global.socketServerInitialized}`);
+    console.log(`Visit http://localhost:${port}/websocket-test to test WebSocket connection`);
 });
 
 // Handle process termination

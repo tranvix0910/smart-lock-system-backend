@@ -3,45 +3,25 @@ import { Server } from "socket.io";
 let io;
 
 export const initWebSocket = (httpServer) => {
-    const allowedOrigins = process.env.FRONTEND_URL 
-        ? [process.env.FRONTEND_URL, 'http://localhost:3000'] 
-        : '*';
-    
-    console.log('Initializing WebSocket with allowed origins:', allowedOrigins);
-    
     io = new Server(httpServer, {
         cors: {
-            origin: allowedOrigins,
-            methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-            allowedHeaders: ["Content-Type", "Authorization"],
+            origin: process.env.FRONTEND_URL,
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+            allowedHeaders: [
+                'Content-Type', 
+                'Authorization',
+                'Access-Control-Allow-Origin',
+                'Access-Control-Allow-Headers',
+                'Access-Control-Allow-Methods',
+                'Access-Control-Allow-Credentials'
+            ],
             credentials: true
-        },
-        path: '/socket.io',
-        transports: ['websocket', 'polling'],
-        pingTimeout: 60000,
-        pingInterval: 25000,
-        allowEIO3: true
+        }
     });
 
-    // Create admin namespace
-    const adminNamespace = io.of('/admin');
-
-    // Admin namespace event handlers
-    adminNamespace.on("connection", (socket) => {
-        console.log("Admin client connected:", socket.id);
-        console.log("Admin client handshake:", socket.handshake.address);
-
-        socket.on("disconnect", (reason) => {
-            console.log("Admin client disconnected:", socket.id, "reason:", reason);
-        });
-    });
-
-    // Default namespace event handlers
+    // Socket.IO event handlers
     io.on("connection", (socket) => {
         console.log("Client connected:", socket.id);
-        console.log("Client address:", socket.handshake.address);
-        console.log("Client query:", socket.handshake.query);
-        console.log("Client transport:", socket.conn.transport.name);
 
         socket.on("joinUserRoom", (userId) => {
             socket.join(`user:${userId}`);
@@ -53,20 +33,9 @@ export const initWebSocket = (httpServer) => {
             console.log(`Client ${socket.id} joined room device:${deviceId}`);
         });
 
-        socket.on("disconnect", (reason) => {
-            console.log("Client disconnected:", socket.id, "reason:", reason);
+        socket.on("disconnect", () => {
+            console.log("Client disconnected:", socket.id);
         });
-
-        socket.on("error", (error) => {
-            console.error("Socket error:", error);
-        });
-
-        // Send a welcome message to confirm connection
-        socket.emit('welcome', { message: 'Connected to WebSocket server', socketId: socket.id });
-    });
-
-    io.engine.on("connection_error", (err) => {
-        console.error("Connection error:", err.req, err.code, err.message, err.context);
     });
 
     return io;
