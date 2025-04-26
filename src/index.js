@@ -15,39 +15,16 @@ const app = express();
 const httpServer = createServer(app);
 const port = process.env.PORT || 4000;
 
-const allowedOrigins = [
-    process.env.FRONTEND_URL_PROD,
-    process.env.FRONTEND_URL_DEV,
-];
-
 // CORS middleware
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
-        }
-        return callback(null, true);
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    origin: process.env.FRONTEND_URL,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: [
         'Content-Type', 
-        'Authorization',
-        'Access-Control-Allow-Origin',
-        'Access-Control-Allow-Headers',
-        'Access-Control-Allow-Methods',
-        'Access-Control-Allow-Credentials'
+        'Authorization'
     ],
-    credentials: true,
-    preflightContinue: false,
-    optionsSuccessStatus: 204
+    credentials: true
 }));
-
-// Handle preflight requests
-app.options('*', cors());
 
 // Middleware
 app.use(express.json());

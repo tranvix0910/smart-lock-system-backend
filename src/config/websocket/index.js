@@ -5,15 +5,11 @@ let io;
 export const initWebSocket = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
-            origin: process.env.FRONTEND_URL_PROD,
+            origin: process.env.FRONTEND_URL,
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
             allowedHeaders: [
                 'Content-Type', 
                 'Authorization',
-                'Access-Control-Allow-Origin',
-                'Access-Control-Allow-Headers',
-                'Access-Control-Allow-Methods',
-                'Access-Control-Allow-Credentials'
             ],
             credentials: true
         }

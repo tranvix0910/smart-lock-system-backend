@@ -110,7 +110,7 @@ export const handleMessage = async (topic, payload) => {
                     deviceId: deviceId,
                     status: 'DELETE ACCEPTED FROM CLIENT',
                     timestamp: timestamp
-                }); 
+                });
             }
         }
 
@@ -617,6 +617,6 @@ export const handleMessage = async (topic, payload) => {
 
     } catch (error) {
         console.error('Error processing message:', error);
-    }   
+    }
 }
 
