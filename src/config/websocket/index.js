@@ -10,24 +10,11 @@ export const initWebSocket = (httpServer) => {
             allowedHeaders: ["Content-Type", "Authorization"],
             credentials: true
         },
-        allowEIO3: true, // Added for compatibility
-        transports: ['polling', 'websocket'],
-        pingTimeout: 60000,
-        pingInterval: 25000
+        path: '/socket.io'
     });
 
-    // Create admin namespace with auth
+    // Create admin namespace
     const adminNamespace = io.of('/admin');
-    
-    adminNamespace.use((socket, next) => {
-        const { username, password } = socket.handshake.auth;
-        // Validate credentials here
-        if (username === 'admin' && password === 'admin') {
-            next();
-        } else {
-            next(new Error('Authentication failed'));
-        }
-    });
 
     // Admin namespace event handlers
     adminNamespace.on("connection", (socket) => {
