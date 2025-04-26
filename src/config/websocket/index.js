@@ -5,21 +5,40 @@ let io;
 export const initWebSocket = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
-            origin: process.env.FRONTEND_URL,
-            methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-            allowedHeaders: [
-                'Content-Type', 
-                'Authorization',
-                'Access-Control-Allow-Origin',
-                'Access-Control-Allow-Headers',
-                'Access-Control-Allow-Methods',
-                'Access-Control-Allow-Credentials'
-            ],
+            origin: process.env.FRONTEND_URL || "http://localhost:3000",
+            methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+            allowedHeaders: ["Content-Type", "Authorization"],
             credentials: true
+        },
+        allowEIO3: true, // Added for compatibility
+        transports: ['polling', 'websocket'],
+        pingTimeout: 60000,
+        pingInterval: 25000
+    });
+
+    // Create admin namespace with auth
+    const adminNamespace = io.of('/admin');
+    
+    adminNamespace.use((socket, next) => {
+        const { username, password } = socket.handshake.auth;
+        // Validate credentials here
+        if (username === 'admin' && password === 'admin') {
+            next();
+        } else {
+            next(new Error('Authentication failed'));
         }
     });
 
-    // Socket.IO event handlers
+    // Admin namespace event handlers
+    adminNamespace.on("connection", (socket) => {
+        console.log("Admin client connected:", socket.id);
+
+        socket.on("disconnect", () => {
+            console.log("Admin client disconnected:", socket.id);
+        });
+    });
+
+    // Default namespace event handlers
     io.on("connection", (socket) => {
         console.log("Client connected:", socket.id);
 
@@ -35,6 +54,10 @@ export const initWebSocket = (httpServer) => {
 
         socket.on("disconnect", () => {
             console.log("Client disconnected:", socket.id);
+        });
+
+        socket.on("error", (error) => {
+            console.error("Socket error:", error);
         });
     });
 
