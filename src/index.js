@@ -18,13 +18,18 @@ const port = process.env.PORT || 4000;
 // CORS middleware
 app.use(cors({
     origin: process.env.FRONTEND_URL,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
         'Content-Type', 
-        'Authorization'
+        'Authorization', 
+        'Access-Control-Allow-Origin',
+        'Access-Control-Allow-Headers'
     ],
     credentials: true
 }));
+
+// Preflight request handling
+app.options('*', cors());
 
 // Middleware
 app.use(express.json());
@@ -35,18 +40,43 @@ app.use(fileUpload());
 db.connectDB();
 
 // HTTP Logger
-app.use(morgan('combined'));
+if (process.env.NODE_ENV !== 'production') {
+    app.use(morgan('combined'));
+}
+
+// Status route to check if server is running
+app.get('/status', (req, res) => {
+    res.send({
+        status: 'Server is running',
+        env: process.env.NODE_ENV || 'development',
+        frontendUrl: process.env.FRONTEND_URL || 'not set'
+    });
+});
 
 // Router
 routes(app);
 
-// Khởi tạo WebSocket
-initWebSocket(httpServer);
+// Initialize WebSocket
+const socketServer = initWebSocket(httpServer);
 
-// Kết nối AWS IoT Core
+// Log when WebSocket server is initialized
+console.log(`WebSocket server initialized with CORS origin: ${process.env.FRONTEND_URL || '*'}`);
+
+// Connect to AWS IoT Core
 connectToAWSIoT();
 
 // Start the server using httpServer instead of app
 httpServer.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`CORS allowed origin: ${process.env.FRONTEND_URL || '*'}`);
+});
+
+// Handle process termination
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    httpServer.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
 });
