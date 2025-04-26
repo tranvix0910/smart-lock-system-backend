@@ -10,6 +10,10 @@ export const initWebSocket = (httpServer) => {
             allowedHeaders: [
                 'Content-Type', 
                 'Authorization',
+                'Access-Control-Allow-Origin',
+                'Access-Control-Allow-Headers',
+                'Access-Control-Allow-Methods',
+                'Access-Control-Allow-Credentials'
             ],
             credentials: true
         }
