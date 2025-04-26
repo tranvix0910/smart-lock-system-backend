@@ -52,21 +52,32 @@ app.get('/status', (req, res) => {
     });
 });
 
-
-
 // Router
 routes(app);
 
-// Initialize WebSocket with error handling
+console.log('=== WebSocket Initialization Starting ===');
+
+// Initialize WebSocket with error handling and improved logging
 let socketServer;
 try {
+    console.log('About to initialize WebSocket server...');
     socketServer = initWebSocket(httpServer);
     global.socketServerInitialized = true;
     console.log(`WebSocket server initialized successfully with CORS origin: ${process.env.FRONTEND_URL || '*'}`);
+    
+    // Verify namespaces are set up
+    if (socketServer && socketServer.nsps) {
+        console.log('Active namespaces:', Object.keys(socketServer.nsps));
+    } else {
+        console.warn('WebSocket server initialized but no namespaces found');
+    }
 } catch (error) {
     console.error('Error initializing WebSocket server:', error);
+    console.error('Error stack:', error.stack);
     global.socketServerInitialized = false;
 }
+
+console.log('=== WebSocket Initialization Complete ===');
 
 // Connect to AWS IoT Core
 connectToAWSIoT();

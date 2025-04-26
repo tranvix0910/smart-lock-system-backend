@@ -38,6 +38,19 @@ export const initWebSocket = (httpServer) => {
         });
     });
 
+    io.engine.on("connection_error", (err) => {
+        console.error("Connection error details:", {
+            code: err.code,
+            message: err.message,
+            context: err.context,
+            req: {
+                url: err.req?.url,
+                headers: err.req?.headers,
+                method: err.req?.method
+            }
+        });
+    });
+    
     return io;
 };
 
